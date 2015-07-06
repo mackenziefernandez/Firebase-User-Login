@@ -1,0 +1,12 @@
+﻿<div class="row">
+    <div class="six columns">
+        <h2>
+            Let's sign you up</h2>
+        <input ng-model="user.email" type='text' id='emailInput' placeholder='Email'>
+        <input ng-model="user.domain" type='text' id='domainInput' placeholder='Domain'>
+        <input ng-model="user.password" type='password' id='passwordInput' placeholder='Password'
+            ng-keyup="$event.keyCode== 13 && createUser(user)">
+        <button id="login-btn" class="sign-up-btn" ng-click="createUser(user)">
+            Sign Up!</button>
+    </div>
+</div>
