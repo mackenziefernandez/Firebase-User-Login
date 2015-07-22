@@ -1,8 +1,7 @@
-﻿var app = angular.module("myApp", ['ngRoute', 'firebase'])
+﻿var app = angular.module("myApp", ['ngRoute', 'firebase', 'flash'])
 
 // ------------------------ User creation and login necessities -------------------------------------------------------------
-.controller('UserController', function ($scope, $route, $routeParams, $location, $firebaseObject, $firebaseArray, $window) {
-
+.controller('UserController', function ($scope, $route, $routeParams, $location, $firebaseObject, $firebaseArray, $window, Flash) {
     $scope.user;
 
     $scope.$route = $route;
@@ -19,6 +18,7 @@
         }, function (error, userData) {
             if (error) {
                 console.log("Error creating user:", error);
+                Flash.create('danger', 'Error creating user: ' + error, "flash-message");
             } else {
                 console.log("Successfully created user account with uid:", userData.uid);
                 // Log the user in
@@ -30,6 +30,7 @@
                         console.log("Login Failed!", error);
                     } else {
                         console.log("Authenticated successfully with payload:", authData);
+                        Flash.create('success', 'Account created successfully', "flash-message");
                         $scope.isLoggedIn = myFireRef.getAuth();
                         $scope.$apply();
 
@@ -49,10 +50,13 @@
         }, function (error, authData) {
             if (error) {
                 console.log("Login Failed!", error);
+                Flash.create('danger', 'Login failed! ' + error, "flash-message");
             } else {
                 console.log("Authenticated successfully with payload:", authData);
+                Flash.create('success', 'Successfully logged in!', "flash-message");
                 $scope.isLoggedIn = myFireRef.getAuth();
                 $scope.$apply();
+                $route.reload();
             }
         });
     }
@@ -60,8 +64,10 @@
     $scope.logout = function () {
         myFireRef.unauth();
         console.log("logging out");
+        Flash.create('success', 'Successfully logged out', "flash-message");
         $scope.isLoggedIn = myFireRef.getAuth();
         $scope.$apply();
+        $route.reload();
     }
 
     $scope.forgotPasswordEmail = function (user) {
@@ -71,13 +77,16 @@
             if (error) {
                 switch (error.code) {
                     case "INVALID_USER":
+                        Flash.create('error', 'The specified user account does not exist.', "flash-message");
                         console.log("The specified user account does not exist.");
                         break;
                     default:
                         console.log("Error resetting password:", error);
+                        Flash.create('danger', 'Error resetting password: ' + error, "flash-message");
                 }
             } else {
                 console.log("Password reset email sent successfully!");
+                Flash.create('success', "Password reset email sent successfully!", "flash-message");
             }
         });
     }
@@ -90,8 +99,10 @@
         }, function (error) {
             if (error) {
                 console.log(error);
+                Flash.create('danger', "Error changing password: " + error, "flash-message");
             } else {
                 console.log("User password changed successfully!");
+                Flash.create('success', "User password changed successfully!", "flash-message");
             }
         });
     };
